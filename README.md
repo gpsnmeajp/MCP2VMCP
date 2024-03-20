@@ -1,7 +1,7 @@
 # MCP2VMCP
 [mocopi](https://www.sony.jp/mocopi/)の姿勢情報を、[VMCProtocol](https://sh-akira.github.io/VirtualMotionCaptureProtocol/)で送信するソフトウェア。  
 
-主にVRM1環境のEVMC4Uの利用やVMCProtocolのテストに使用することを想定しているため、高度な機能や保存機能を提供していません。  
+主にVRM1環境の[EVMC4U](https://github.com/gpsnmeajp/EasyVirtualMotionCaptureForUnity)の利用や[VMCProtocol](https://sh-akira.github.io/VirtualMotionCaptureProtocol/)のテストに使用することを想定しているため、高度な機能や保存機能を提供していません。  
 非常に簡易的な機能ですが、VRM0とVRM1の両方に対応しています。  
 
 ※配信に耐えうる高度な機能や高品質さを求める場合は、Sony公式でも紹介されている[バーチャルモーションキャプチャー](https://vmc.info/)を推奨します。
@@ -17,8 +17,10 @@ v0.02: テンキー操作により表情を操作する機能と、接続先を�
 <img src="vmpc_logo_128x128.png"></img> <img src="mocopiSDK_Blue_64px.png"></img>
 
 ## How to use
++ VRMファイルを選択します。
 + [mocopiアプリからのデータ送信方法](https://www.sony.net/Products/mocopi-dev/jp/documents/ReceiverPlugin/SendData.html)
 + 体が動くことを確認したら、表情ボタンあるいはテンキーで表情を変更できます。
++ [EVMC4U](https://github.com/gpsnmeajp/EasyVirtualMotionCaptureForUnity)などの受信アプリケーションを開きます。[EVMC4U](https://github.com/gpsnmeajp/EasyVirtualMotionCaptureForUnity)など自動ロードに対応しているソフトウェアの場合は、自動でモデルが読み込まれます。
 
 ## License
 SampleBonesSendBundle.cs(VMCProtocol公式サンプルの改造品)のライセンスはCC0です。(ソースコード先頭に記載)  
