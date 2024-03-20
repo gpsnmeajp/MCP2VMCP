@@ -24,7 +24,7 @@ v0.02c: VRM1のボーンセットアップが不完全な問題を修正、テ�
 
 ## License
 SampleBonesSendBundle.cs(VMCProtocol公式サンプルの改造品)のライセンスはCC0です。(ソースコード先頭に記載)  
-本ソフトウェアの再配布や利用はMITライセンスに従ってください。
+本ソフトウェアの再配布やプロジェクトの再利用はMITライセンスに従ってください。
 
 利用OSSのライセンスは、zipファイル内の3rdpartylicenses(ExternalReceiverPack).txtをご確認ください。  
 
