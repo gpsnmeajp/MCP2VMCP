@@ -560,7 +560,16 @@ public class SampleBonesSendBundle : MonoBehaviour
 
     void SendBoneTransformForTracker(ref Bundle bundle, HumanBodyBones bone, string DeviceSerial)
     {
-        var DeviceTransform = animator.GetBoneTransform(bone);
+        Transform DeviceTransform;
+        if (vrm10Root)
+        {
+            DeviceTransform = vrm10Root.Humanoid.GetBoneTransform(bone);//生のBone
+        }
+        else
+        {
+            DeviceTransform = animator.GetBoneTransform(bone);//正規化されたBone
+        }
+        
         if (DeviceTransform != null)
         {
             bundle.Add(new Message("/VMC/Ext/Tra/Pos",
