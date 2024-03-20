@@ -16,6 +16,10 @@ v0.02: テンキー操作により表情を操作する機能と、接続先を�
 
 <img src="vmpc_logo_128x128.png"></img> <img src="mocopiSDK_Blue_64px.png"></img>
 
+## How to use
++ [mocopiアプリからのデータ送信方法](https://www.sony.net/Products/mocopi-dev/jp/documents/ReceiverPlugin/SendData.html)
++ 体が動くことを確認したら、表情ボタンあるいはテンキーで表情を変更できます。
+
 ## License
 SampleBonesSendBundle.cs(VMCProtocol公式サンプルの改造品)のライセンスはCC0です。(ソースコード先頭に記載)  
 本ソフトウェアの再配布や利用はMITライセンスに従ってください。
