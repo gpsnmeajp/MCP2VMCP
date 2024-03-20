@@ -4,6 +4,8 @@
 主にVRM1環境の[EVMC4U](https://github.com/gpsnmeajp/EasyVirtualMotionCaptureForUnity)の利用や[VMCProtocol](https://sh-akira.github.io/VirtualMotionCaptureProtocol/)のテストに使用することを想定しているため、高度な機能や保存機能を提供していません。  
 非常に簡易的な機能ですが、VRM0とVRM1の両方に対応しています。  
 
+WindowsとMacに対応しています。
+
 ※配信に耐えうる高度な機能や高品質さを求める場合は、Sony公式でも紹介されている[バーチャルモーションキャプチャー](https://vmc.info/)を推奨します。
 
 v0.02c: VRM1のボーンセットアップが不完全な問題を修正、テンキー操作により表情を操作する機能と、接続先を変更する機能、ファイル読み込みダイアログなどを実装しました。
@@ -35,6 +37,7 @@ SampleBonesSendBundle.cs(VMCProtocol公式サンプルの改造品)のライセ�
 <img src="screenshot2.png"></img>  
 <img src="screenshot3.png"></img>  
 <img src="screenshot4.png"></img>  
+![image](https://github.com/gpsnmeajp/MCP2VMCP/assets/33391403/7c83ccd6-b54d-44f4-ae81-d6f100ba61eb)
 
 # [お問合せ先(Discordサーバー)](https://discord.gg/nGapSR7)
 **本ソフトウェアは、開発者向けを想定しており、積極的なサポートは提供していません**  
