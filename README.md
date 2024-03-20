@@ -24,7 +24,7 @@ v0.02: テンキー操作により表情を操作する機能と、接続先を�
 
 ## License
 SampleBonesSendBundle.cs(VMCProtocol公式サンプルの改造品)のライセンスはCC0です。(ソースコード先頭に記載)  
-本ソフトウェアの再配布や利用はMITライセンスに従ってください。
+本ソフトウェアの再配布やプロジェクトの再利用はMITライセンスに従ってください。
 
 利用OSSのライセンスは、zipファイル内の3rdpartylicenses(ExternalReceiverPack).txtをご確認ください。  
 
