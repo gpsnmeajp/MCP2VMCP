@@ -27,6 +27,8 @@ using System.Net;
 [RequireComponent(typeof(uOSC.uOscClient))]
 public class SampleBonesSendBundle : MonoBehaviour
 {
+    const string MCP2VMCP_Version = "v0.02c";
+
     uOSC.uOscClient uClient = null;
 
     public GameObject Model = null;
@@ -44,6 +46,7 @@ public class SampleBonesSendBundle : MonoBehaviour
 
     bool expression = true;
     bool body = true;
+    bool originalBone = true;
 
     string address = "127.0.0.1";
     string port = "39539";
@@ -73,8 +76,14 @@ public class SampleBonesSendBundle : MonoBehaviour
 
         Application.logMessageReceivedThreaded += (text, stack, logType) =>
         {
+            if (text.StartsWith("A Native Collection has not been disposed"))
+            {
+                return;
+            }
+
             string typeString = "";
-            switch (logType) {
+            switch (logType)
+            {
                 case LogType.Assert: typeString = "[Assert]"; break;
                 case LogType.Error: typeString = "[Error]"; break;
                 case LogType.Warning: typeString = "[Warning]"; break;
@@ -84,7 +93,10 @@ public class SampleBonesSendBundle : MonoBehaviour
             }
 
             log = DateTime.Now + "\n" + typeString + "\n" + text + "\n\n" + log;
-            log = log.Substring(0, 65535);
+            if (log.Length > 65535)
+            {
+                log = log.Substring(0, 65535);
+            }
         };
 
         Application.targetFrameRate = 60; //60fps
@@ -123,13 +135,14 @@ public class SampleBonesSendBundle : MonoBehaviour
             }
         }
     }
-    void Update()
+    void LateUpdate()
     {
         //Only model updated
         if (Model != null && OldModel != Model)
         {
-            animator = Model.GetComponent<Animator>();
             vrm10Root = Model.GetComponent<Vrm10Instance>();
+
+            animator = Model.GetComponent<Animator>();
             blendShapeProxy = Model.GetComponent<VRMBlendShapeProxy>();
             OldModel = Model;
         }
@@ -154,7 +167,15 @@ public class SampleBonesSendBundle : MonoBehaviour
                 {
                     if (bone != HumanBodyBones.LastBone)
                     {
-                        var Transform = animator.GetBoneTransform(bone);
+                        Transform Transform;
+                        if (originalBone && vrm10Root)
+                        {
+                            Transform = vrm10Root.Humanoid.GetBoneTransform(bone);//生のBone
+                        }
+                        else {
+                            Transform = animator.GetBoneTransform(bone);//正規化されたBone
+                        }
+
                         if (Transform != null)
                         {
                             boneBundle.Add(new Message("/VMC/Ext/Bone/Pos",
@@ -275,11 +296,10 @@ public class SampleBonesSendBundle : MonoBehaviour
             {
                 GUI.Window(status_window_id, new Rect(0, 0, 340, 155), (id) =>
                 {
-                    GUILayout.Label("VMCP Port: " + uClient.address + ":"+ uClient.port, LabelStyle);
+                    GUILayout.Label("VMCP Port: " + uClient.address + ":" + uClient.port, LabelStyle);
                     GUILayout.Label("mocopi Port: 12351", LabelStyle);
                     GUILayout.Label("VRM Type: " + vrmType, LabelStyle);
-
-                    GUILayout.Space(23);
+                    GUILayout.Label("MCP2VMCP: "+MCP2VMCP_Version, LabelStyle);
 
                     if (GUILayout.Button("パネル切替(Next Panel)", ButtonStyle))
                     {
@@ -312,6 +332,10 @@ public class SampleBonesSendBundle : MonoBehaviour
                         if (GUILayout.Button("Body: " + (body ? "有効(Enabled)" : "無効(Disabled)"), ButtonStyle))
                         {
                             body = !body;
+                        }
+                        if (GUILayout.Button("正規化ボーン: " + ((!originalBone) ? "有効(Enabled)" : "無効(Disabled)"), ButtonStyle))
+                        {
+                            originalBone = !originalBone;
                         }
 
                         GUILayout.Space(23);
@@ -439,6 +463,13 @@ public class SampleBonesSendBundle : MonoBehaviour
                             resetBE();
                             blendShapeProxy?.SetValue(BlendShapePreset.Neutral, 1);
                             vrm10Root?.Runtime.Expression.SetWeight(ExpressionKey.Neutral, 1);
+                        }
+                        GUILayout.Button("", SquareButtonStyle);
+                        if (GUILayout.Button(".\nSurprised", SquareButtonStyle) || (tenkeyEnable && Input.GetKey(KeyCode.KeypadPeriod)))
+                        {
+                            resetBE();
+                            blendShapeProxy?.SetValue("Surprised", 1);
+                            vrm10Root?.Runtime.Expression.SetWeight(ExpressionKey.Surprised, 1);
                         }
 
                         GUILayout.EndHorizontal();
@@ -570,7 +601,8 @@ public class SampleBonesSendBundle : MonoBehaviour
 
             }
         }
-        catch (Exception e) {
+        catch (Exception e)
+        {
             loadExceptionString = e.Message + "\n\n" + e.StackTrace;
         }
     }
@@ -621,22 +653,11 @@ public class SampleBonesSendBundle : MonoBehaviour
 
         try
         {
-            Vrm10Data vrm10 = Vrm10Data.Parse(gltfData);
-            GltfData migratedGltfData = null;
-            Vrm10Importer vrm10Importer = new Vrm10Importer(vrm10);
-
             synchronizationContext.Post(async (_) =>
             {
-                RuntimeGltfInstance gltfInstance = await vrm10Importer.LoadAsync(new VRMShaders.ImmediateCaller());
-                gltfData.Dispose();
-                vrm10Importer.Dispose();
-
-                if (migratedGltfData != null)
-                {
-                    migratedGltfData.Dispose();
-                }
-
-                Model = gltfInstance.Root;
+                var instance = await Vrm10.LoadBytesAsync(VRMdataRaw, canLoadVrm0X: false, showMeshes: true);
+                await Task.Delay(100); //VRM1不具合対策
+                Model = instance.gameObject;
                 Model.transform.parent = this.transform;
                 animator = Model.GetComponent<Animator>();
                 mainCamera.parent = animator.GetBoneTransform(HumanBodyBones.Hips);
@@ -644,8 +665,13 @@ public class SampleBonesSendBundle : MonoBehaviour
                 vrmType = "VRM1";
                 loadExceptionString = "";
 
-                gltfInstance.EnableUpdateWhenOffscreen();
-                gltfInstance.ShowMeshes();
+                var meshes = Model.GetComponentsInChildren<SkinnedMeshRenderer>();
+                foreach (var m in meshes) { 
+                    m.updateWhenOffscreen = true;
+                }
+
+                //開放
+                gltfData?.Dispose();
 
                 var mocopiAvatar = Model.AddComponent<Mocopi.Receiver.MocopiAvatar>();
                 GetComponent<Mocopi.Receiver.MocopiSimpleReceiver>().enabled = false;
